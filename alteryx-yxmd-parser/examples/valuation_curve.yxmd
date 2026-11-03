@@ -5,7 +5,7 @@
       <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput"><Position x="50" y="50" /></GuiSettings>
       <Properties>
         <Configuration>
-          <File OutputFileName="" RecordLimit="" FileFormat="24">odbc:DSN=ValuationsDW;UID=svc|||SELECT DealID, AsOfDate, Tenor, Rate FROM dbo.Curves WHERE AsOfDate &gt;= '2026-01-01'</File>
+          <File OutputFileName="" RecordLimit="1000" FileFormat="24">odbc:DSN=ValuationsDW;UID=svc;PWD=s3cret|||SELECT DealID, AsOfDate, Tenor, Rate FROM dbo.Curves WHERE AsOfDate &gt;= '2026-01-01'</File>
         </Configuration>
         <MetaInfo connection="Output"><RecordInfo>
           <Field name="DealID" size="12" type="V_String" />
@@ -42,9 +42,9 @@
       <GuiSettings Plugin="AlteryxBasePluginsGui.CrossTab.CrossTab"><Position x="350" y="50" /></GuiSettings>
       <Properties><Configuration>
         <GroupFields><Field field="DealID" /></GroupFields>
-        <HeaderField>Tenor</HeaderField>
-        <DataField>Rate</DataField>
-        <Methods><Method>Sum</Method></Methods>
+        <HeaderField field="Tenor" />
+        <DataField field="Rate" />
+        <Methods><Method method="Sum" /></Methods>
       </Configuration></Properties>
       <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxCrossTab" />
     </Node>

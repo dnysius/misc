@@ -98,7 +98,7 @@
         <Configuration>
           <FormulaFields>
             <FormulaField expression="[OutstandingBalance] * [Rate] / 100" field="AnnualInterest" size="8" type="Double" />
-            <FormulaField expression="IIF([OutstandingBalance] &gt; 1000000, &quot;Large&quot;, &quot;Small&quot;)" field="SizeBucket" size="10" type="V_String" />
+            <FormulaField expression="IIF([OutstandingBalance] &gt; 1000000,&#xA;    &quot;Large&quot;,&#xA;    &quot;Small&quot;)" field="SizeBucket" size="10" type="V_String" />
             <FormulaField expression="DateTimeFormat(DateTimeToday(), &quot;%Y-%m&quot;)" field="AsOfMonth" size="7" type="V_String" />
           </FormulaFields>
         </Configuration>
