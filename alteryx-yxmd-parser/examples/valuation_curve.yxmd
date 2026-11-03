@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<AlteryxDocument yxmdVer="2022.3">
+  <Nodes>
+    <Node ToolID="1">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput"><Position x="50" y="50" /></GuiSettings>
+      <Properties>
+        <Configuration>
+          <File OutputFileName="" RecordLimit="" FileFormat="24">odbc:DSN=ValuationsDW;UID=svc|||SELECT DealID, AsOfDate, Tenor, Rate FROM dbo.Curves WHERE AsOfDate &gt;= '2026-01-01'</File>
+        </Configuration>
+        <MetaInfo connection="Output"><RecordInfo>
+          <Field name="DealID" size="12" type="V_String" />
+          <Field name="AsOfDate" size="10" type="Date" />
+          <Field name="Tenor" size="4" type="Int32" />
+          <Field name="Rate" size="8" type="Double" />
+        </RecordInfo></MetaInfo>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+    </Node>
+    <Node ToolID="2">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.Sort.Sort"><Position x="150" y="50" /></GuiSettings>
+      <Properties><Configuration><SortInfo locale="0">
+        <Field field="DealID" order="Ascending" /><Field field="Tenor" order="Ascending" />
+      </SortInfo></Configuration></Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSort" />
+    </Node>
+    <Node ToolID="3">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula"><Position x="250" y="50" /></GuiSettings>
+      <Properties><Configuration>
+        <UpdateField value="False" />
+        <UpdateField_Name />
+        <CreateField_Name>RateDelta</CreateField_Name>
+        <CreateField_Type>Double</CreateField_Type>
+        <CreateField_Size>8</CreateField_Size>
+        <OtherRows>1</OtherRows>
+        <NullHandling>Null</NullHandling>
+        <GroupByFields><Field field="DealID" /></GroupByFields>
+        <Expression>[Rate] - [Row-1:Rate]</Expression>
+      </Configuration></Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+    </Node>
+    <Node ToolID="4">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.CrossTab.CrossTab"><Position x="350" y="50" /></GuiSettings>
+      <Properties><Configuration>
+        <GroupFields><Field field="DealID" /></GroupFields>
+        <HeaderField>Tenor</HeaderField>
+        <DataField>Rate</DataField>
+        <Methods><Method>Sum</Method></Methods>
+      </Configuration></Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxCrossTab" />
+    </Node>
+    <Node ToolID="5">
+      <GuiSettings Plugin="AlteryxSpatialPluginsGui.SpatialMatch.SpatialMatch"><Position x="350" y="150" /></GuiSettings>
+      <Properties><Configuration><MatchType>Intersects</MatchType><TargetField>Geo</TargetField></Configuration></Properties>
+    </Node>
+    <Node ToolID="6">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileOutput.DbFileOutput"><Position x="450" y="50" /></GuiSettings>
+      <Properties><Configuration>
+        <File MaxRecords="" FileFormat="24">odbc:DSN=ValuationsDW|dbo.CurveWide</File>
+        <FormatSpecificOptions><OutputMode>Overwrite</OutputMode></FormatSpecificOptions>
+      </Configuration></Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileOutput" />
+    </Node>
+    <Node ToolID="7">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileOutput.DbFileOutput"><Position x="450" y="150" /></GuiSettings>
+      <Properties><Configuration><File MaxRecords="" FileFormat="0">C:\out\deltas.csv</File></Configuration></Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileOutput" />
+    </Node>
+  </Nodes>
+  <Connections>
+    <Connection><Origin ToolID="1" Connection="Output" /><Destination ToolID="2" Connection="Input" /></Connection>
+    <Connection><Origin ToolID="2" Connection="Output" /><Destination ToolID="3" Connection="Input" /></Connection>
+    <Connection><Origin ToolID="3" Connection="Output" /><Destination ToolID="4" Connection="Input" /></Connection>
+    <Connection><Origin ToolID="3" Connection="Output" /><Destination ToolID="7" Connection="Input" /></Connection>
+    <Connection><Origin ToolID="4" Connection="Output" /><Destination ToolID="6" Connection="Input" /></Connection>
+    <Connection><Origin ToolID="3" Connection="Output" /><Destination ToolID="5" Connection="Targets" /></Connection>
+  </Connections>
+  <Properties><MetaInfo><Name>Valuation Curve Widening</Name></MetaInfo></Properties>
+</AlteryxDocument>

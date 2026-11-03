@@ -1,0 +1,423 @@
+<?xml version="1.0"?>
+<AlteryxDocument yxmdVer="2023.1">
+  <Nodes>
+    <Node ToolID="12">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput">
+        <Position x="54" y="54" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Passwords />
+          <File OutputFileName="" RecordLimit="" SearchSubDirs="False" FileFormat="0">C:\Deals\loan_tape.csv</File>
+          <FormatSpecificOptions>
+            <HeaderRow>True</HeaderRow>
+            <Delimeter>,</Delimeter>
+            <CodePage>28591</CodePage>
+          </FormatSpecificOptions>
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText>loan_tape.csv</DefaultAnnotationText>
+        </Annotation>
+        <MetaInfo connection="Output">
+          <RecordInfo>
+            <Field name="LoanID" size="20" source="File: C:\Deals\loan_tape.csv" type="V_String" />
+            <Field name="CustomerID" size="20" type="V_String" />
+            <Field name="Balance" size="8" type="Double" />
+            <Field name="Rate" size="8" type="Double" />
+            <Field name="Status" size="10" type="V_String" />
+            <Field name="OriginationDate" size="10" type="Date" />
+          </RecordInfo>
+        </MetaInfo>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+    </Node>
+
+    <Node ToolID="7">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput">
+        <Position x="54" y="200" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <File OutputFileName="" RecordLimit="" FileFormat="25">C:\Deals\customers.xlsx|||Sheet1</File>
+        </Configuration>
+        <Annotation DisplayMode="0"><DefaultAnnotationText>customers.xlsx</DefaultAnnotationText></Annotation>
+        <MetaInfo connection="Output">
+          <RecordInfo>
+            <Field name="CustID" size="20" type="V_String" />
+            <Field name="CustomerName" size="100" type="V_WString" />
+            <Field name="Region" size="10" type="V_String" />
+          </RecordInfo>
+        </MetaInfo>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+    </Node>
+
+    <Node ToolID="5">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+        <Position x="150" y="54" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <OrderChanged value="False" />
+          <CommaDecimal value="False" />
+          <SelectFields>
+            <SelectField field="LoanID" selected="True" />
+            <SelectField field="CustomerID" selected="True" />
+            <SelectField field="Balance" selected="True" rename="OutstandingBalance" />
+            <SelectField field="Rate" selected="True" type="FixedDecimal" size="19.6" />
+            <SelectField field="Status" selected="True" />
+            <SelectField field="OriginationDate" selected="False" />
+            <SelectField field="*Unknown" selected="False" />
+          </SelectFields>
+        </Configuration>
+        <Annotation DisplayMode="0"><AnnotationText>Tidy columns</AnnotationText></Annotation>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+    </Node>
+
+    <Node ToolID="9">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.Filter.Filter">
+        <Position x="250" y="54" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Expression>[Status] = "Performing" AND [OutstandingBalance] &gt; %User.MinBalance%</Expression>
+          <Mode>Custom</Mode>
+        </Configuration>
+        <Annotation DisplayMode="0"><AnnotationText>Performing loans only</AnnotationText></Annotation>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFilter" />
+    </Node>
+
+    <Node ToolID="14">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.Formula.Formula">
+        <Position x="350" y="54" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <FormulaFields>
+            <FormulaField expression="[OutstandingBalance] * [Rate] / 100" field="AnnualInterest" size="8" type="Double" />
+            <FormulaField expression="IIF([OutstandingBalance] &gt; 1000000, &quot;Large&quot;, &quot;Small&quot;)" field="SizeBucket" size="10" type="V_String" />
+            <FormulaField expression="DateTimeFormat(DateTimeToday(), &quot;%Y-%m&quot;)" field="AsOfMonth" size="7" type="V_String" />
+          </FormulaFields>
+        </Configuration>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFormula" />
+    </Node>
+
+    <Node ToolID="2">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.Join.Join">
+        <Position x="450" y="120" />
+      </GuiSettings>
+      <Properties>
+        <Configuration joinByRecordPos="False">
+          <JoinInfo connection="Left">
+            <Field field="CustomerID" />
+          </JoinInfo>
+          <JoinInfo connection="Right">
+            <Field field="CustID" />
+          </JoinInfo>
+          <SelectConfiguration>
+            <Configuration outputConnection="Join">
+              <OrderChanged value="False" />
+              <SelectFields>
+                <SelectField field="Right_CustID" selected="False" />
+                <SelectField field="*Unknown" selected="True" />
+              </SelectFields>
+            </Configuration>
+          </SelectConfiguration>
+        </Configuration>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxJoin" />
+    </Node>
+
+    <Node ToolID="20">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="120" y="400" width="400" height="150" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Manual adjustments</Caption>
+          <Style TextColor="#314c4a" FillColor="#ecf2f2" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+        </Configuration>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="21">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.TextInput.TextInput">
+            <Position x="150" y="450" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <NumRows value="2" />
+              <Fields>
+                <Field name="LoanID" />
+                <Field name="CustomerID" />
+                <Field name="OutstandingBalance" />
+                <Field name="Rate" />
+                <Field name="Status" />
+              </Fields>
+              <Data>
+                <r><c>ADJ-001</c><c>C100</c><c>250000</c><c>4.5</c><c>Performing</c></r>
+                <r><c>ADJ-002</c><c>C200</c><c>75000</c><c>6.1</c><c>Performing</c></r>
+              </Data>
+            </Configuration>
+            <Annotation DisplayMode="0"><AnnotationText>Deal team overrides</AnnotationText></Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxTextInput" />
+        </Node>
+        <Node ToolID="22">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Union.Union">
+            <Position x="300" y="450" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <ByName_ErrorMode>Warning</ByName_ErrorMode>
+              <ByName_OutputMode>All</ByName_OutputMode>
+              <Mode>ByName</Mode>
+              <SetOutputOrder value="False" />
+            </Configuration>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxUnion" />
+        </Node>
+      </ChildNodes>
+    </Node>
+
+    <Node ToolID="25">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.Unique.Unique">
+        <Position x="550" y="120" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <UniqueFields>
+            <Field field="LoanID" />
+          </UniqueFields>
+        </Configuration>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxUnique" />
+    </Node>
+
+    <Node ToolID="30">
+      <GuiSettings Plugin="AlteryxGuiToolkit.Macro.Macro">
+        <Position x="650" y="120" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Value name="Check Box (84)">True</Value>
+          <Value name="Check Box (117)">False</Value>
+          <Value name="List Box (11)">LoanID,CustomerName</Value>
+          <Value name="Check Box (164)">True</Value>
+          <Value name="Check Box (165)">False</Value>
+          <Value name="Check Box (166)">True</Value>
+        </Configuration>
+        <Annotation DisplayMode="0"><DefaultAnnotationText>Cleanse</DefaultAnnotationText></Annotation>
+      </Properties>
+      <EngineSettings Macro="Cleanse.yxmc" />
+    </Node>
+
+    <Node ToolID="31">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.Summarize.Summarize">
+        <Position x="750" y="120" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <SummarizeFields>
+            <SummarizeField field="Region" action="GroupBy" rename="Region" />
+            <SummarizeField field="SizeBucket" action="GroupBy" rename="SizeBucket" />
+            <SummarizeField field="OutstandingBalance" action="Sum" rename="TotalBalance" />
+            <SummarizeField field="AnnualInterest" action="Sum" rename="TotalInterest" />
+            <SummarizeField field="LoanID" action="Count" rename="LoanCount" />
+            <SummarizeField field="Rate" action="Avg" rename="AvgRate" />
+          </SummarizeFields>
+        </Configuration>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSummarize" />
+    </Node>
+
+    <Node ToolID="32">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.Sort.Sort">
+        <Position x="850" y="120" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <SortInfo locale="0">
+            <Field field="Region" order="Ascending" />
+            <Field field="TotalBalance" order="Descending" />
+          </SortInfo>
+        </Configuration>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSort" />
+    </Node>
+
+    <Node ToolID="3">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileOutput.DbFileOutput">
+        <Position x="950" y="120" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <File MaxRecords="" FileFormat="0">C:\Deals\out\region_rollup.csv</File>
+          <FormatSpecificOptions>
+            <LineEndStyle>CRLF</LineEndStyle>
+            <Delimeter>,</Delimeter>
+            <HeaderRow>True</HeaderRow>
+          </FormatSpecificOptions>
+        </Configuration>
+        <Annotation DisplayMode="0"><DefaultAnnotationText>region_rollup.csv</DefaultAnnotationText></Annotation>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileOutput" />
+    </Node>
+
+    <Node ToolID="40">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileOutput.DbFileOutput">
+        <Position x="550" y="250" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <File MaxRecords="" FileFormat="0">C:\Deals\out\unmatched_loans.csv</File>
+        </Configuration>
+        <Annotation DisplayMode="0"><AnnotationText>Loans with no customer record</AnnotationText></Annotation>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileOutput" />
+    </Node>
+
+    <Node ToolID="41">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+        <Position x="850" y="250" />
+      </GuiSettings>
+      <Properties><Configuration /></Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+    </Node>
+
+    <Node ToolID="50">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="120" y="600" width="300" height="120" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Old scoring (retired)</Caption>
+          <Disabled value="True" />
+        </Configuration>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="51">
+          <GuiSettings Plugin="AlteryxJupyterPluginGui.JupyterCode.JupyterCode">
+            <Position x="150" y="650" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Port>0</Port>
+              <JupyterGuid>abc-123</JupyterGuid>
+            </Configuration>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxJupyterPluginEngine.dll" EngineDllEntryPoint="AlteryxJupyterCode" />
+        </Node>
+      </ChildNodes>
+    </Node>
+
+    <Node ToolID="60">
+      <GuiSettings Plugin="AlteryxGuiToolkit.TextBox.TextBox">
+        <Position x="54" y="10" width="300" height="40" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Text>Loan tape rollup by region — monthly</Text>
+        </Configuration>
+      </Properties>
+    </Node>
+  </Nodes>
+
+  <Connections>
+    <Connection>
+      <Origin ToolID="12" Connection="Output" />
+      <Destination ToolID="5" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="5" Connection="Output" />
+      <Destination ToolID="9" Connection="Input" />
+    </Connection>
+    <Connection name="#1">
+      <Origin ToolID="9" Connection="True" />
+      <Destination ToolID="22" Connection="Input" />
+    </Connection>
+    <Connection name="#2">
+      <Origin ToolID="21" Connection="Output" />
+      <Destination ToolID="22" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="22" Connection="Output" />
+      <Destination ToolID="14" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="14" Connection="Output" />
+      <Destination ToolID="2" Connection="Left" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="7" Connection="Output" />
+      <Destination ToolID="2" Connection="Right" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="2" Connection="Join" />
+      <Destination ToolID="25" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="2" Connection="Left" />
+      <Destination ToolID="40" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="25" Connection="Unique" />
+      <Destination ToolID="30" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="30" Connection="Output" />
+      <Destination ToolID="31" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="31" Connection="Output" />
+      <Destination ToolID="32" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="32" Connection="Output" />
+      <Destination ToolID="3" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="32" Connection="Output" />
+      <Destination ToolID="41" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="30" Connection="Output" />
+      <Destination ToolID="51" Connection="Input" />
+    </Connection>
+  </Connections>
+
+  <Properties>
+    <Memory default="True" />
+    <GlobalRecordLimit value="0" />
+    <TempFiles default="True" />
+    <Annotation on="True" includeToolName="False" />
+    <ConvErrorLimit value="10" />
+    <ConvErrorLimit_Stop value="False" />
+    <OutputFileName />
+    <MetaInfo>
+      <NameIsFileName value="False" />
+      <Name>Loan Tape Region Rollup</Name>
+      <Description>Monthly rollup of performing loans by region and size bucket</Description>
+      <Author>Deal Advisory</Author>
+    </MetaInfo>
+    <Constants>
+      <Constant>
+        <Namespace>User</Namespace>
+        <Name>MinBalance</Name>
+        <Value>10000</Value>
+        <IsNumeric value="True" />
+      </Constant>
+      <Constant>
+        <Namespace>Engine</Namespace>
+        <Name>WorkflowFileName</Name>
+        <Value>loan_tape_rollup.yxmd</Value>
+        <IsNumeric value="False" />
+      </Constant>
+    </Constants>
+  </Properties>
+</AlteryxDocument>
